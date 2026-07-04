@@ -1,0 +1,6 @@
+# Shared across all FiapGames microservices. Kept here so this repo is
+# deployable standalone; the future k8s orchestration repo may own this instead.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fiapgames
