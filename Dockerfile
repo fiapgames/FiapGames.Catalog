@@ -1,6 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
+COPY nuget.config .
+COPY local-packages/ local-packages/
 COPY FiapGames.Catalog/FiapGames.Catalog.csproj FiapGames.Catalog/
 RUN dotnet restore FiapGames.Catalog/FiapGames.Catalog.csproj
 

@@ -2,6 +2,9 @@ using System.Text.Json.Serialization;
 using FiapGames.Catalog.Configuration;
 using FiapGames.Catalog.Data;
 using FiapGames.Catalog.Services;
+using FiapGames.Catalog.Validators;
+using FiapGames.Contracts.Requests.User;
+using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,9 +33,13 @@ builder.Services.AddMassTransit(busConfigurator =>
 
         rabbitMqConfigurator.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter("catalog", false));
     });
+
+    busConfigurator.AddRequestClient<UserLookupRequested>();
 });
 
-builder.Services.AddControllers()
+builder.Services.AddValidatorsFromAssemblyContaining<CreateGameDtoValidator>();
+
+builder.Services.AddControllers(options => options.Filters.Add<FluentValidationActionFilter>())
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
