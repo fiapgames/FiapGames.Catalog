@@ -66,12 +66,12 @@ CatalogAPI consulta a própria base e retorna os jogos do usuário + dados bási
 
 ## Dependência local do FiapGames.Contracts
 
-Este repositório usa `FiapGames.Contracts` 1.2.0, que inclui os contratos `UserLookupRequested`/`UserLookupResponded` (namespace `FiapGames.Contracts.Requests.User`) — ainda **não publicado** no nuget.org (lá só existe a 1.0.0). Por isso:
+Este repositório usa `FiapGames.Contracts` 1.1.0, que inclui os contratos `UserLookupRequested`/`UserLookupResponded` (namespace `FiapGames.Contracts.Requests.User`) — ainda **não publicado** no nuget.org (lá só existe a 1.0.0). Por isso:
 
 - `nuget.config` na raiz adiciona uma fonte local (`./local-packages`) além do nuget.org.
-- `local-packages/FiapGames.Contracts.1.2.0.nupkg` está commitado no repositório (exceção aberta no `.gitignore`) para que o build — inclusive dentro do Docker — funcione sem depender de nada fora deste repositório.
+- `local-packages/FiapGames.Contracts.1.1.0.nupkg` está commitado no repositório (exceção aberta no `.gitignore`) para que o build — inclusive dentro do Docker — funcione sem depender de nada fora deste repositório.
 
-Quando `FiapGames.Contracts` 1.2.0 (ou superior) for publicado de verdade no nuget.org, remova `local-packages/`, a entrada `fiapgames-contracts-local` do `nuget.config` e as duas linhas correspondentes do `Dockerfile`.
+Quando `FiapGames.Contracts` 1.1.0 (ou superior) for publicado de verdade no nuget.org, remova `local-packages/`, a entrada `fiapgames-contracts-local` do `nuget.config` e as duas linhas correspondentes do `Dockerfile`.
 
 ## Executando localmente
 
