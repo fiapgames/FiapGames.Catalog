@@ -7,6 +7,7 @@ public class Order
     public Guid GameId { get; set; }
     public decimal Price { get; set; }
     public OrderStatus Status { get; set; }
+    public string? RejectionReason { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

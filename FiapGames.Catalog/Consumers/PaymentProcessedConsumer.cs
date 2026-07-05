@@ -22,10 +22,12 @@ public class PaymentProcessedConsumer(CatalogDbContext dbContext, ILogger<Paymen
             return;
         }
 
-        order.Status = paymentProcessed.Status == PaymentStatus.Approved ? OrderStatus.Approved : OrderStatus.Rejected;
+        var approved = paymentProcessed.Status == PaymentStatus.Approved;
+        order.Status = approved ? OrderStatus.Approved : OrderStatus.Rejected;
+        order.RejectionReason = approved ? null : "Pagamento rejeitado pelo serviço de pagamentos.";
         order.UpdatedAt = DateTime.UtcNow;
 
-        if (paymentProcessed.Status == PaymentStatus.Approved)
+        if (approved)
         {
             var alreadyInLibrary = await dbContext.UserGameLibraries
                 .AnyAsync(l => l.UserId == order.UserId && l.GameId == order.GameId, context.CancellationToken);

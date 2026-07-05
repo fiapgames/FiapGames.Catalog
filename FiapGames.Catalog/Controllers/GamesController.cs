@@ -51,8 +51,8 @@ public class GamesController(IGameService gameService, IPurchaseService purchase
         {
             PurchaseResultStatus.Success => Accepted(result.Order),
             PurchaseResultStatus.GameNotFound => NotFound(),
-            PurchaseResultStatus.GameInactive => Conflict("Game is not available for purchase."),
-            PurchaseResultStatus.AlreadyOwned => Conflict("User already owns this game."),
+            PurchaseResultStatus.GameInactive => Conflict("Jogo não está disponível para compra."),
+            PurchaseResultStatus.AlreadyOwned => Conflict("Usuário já possui este jogo."),
             _ => Problem()
         };
     }

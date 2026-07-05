@@ -25,6 +25,7 @@ Endpoints:
 | PUT | `/games/{id}` | Atualiza um jogo |
 | DELETE | `/games/{id}` | Inativa um jogo (`Active=false`) |
 | POST | `/games/{id}/purchase` | Inicia a compra (cria `Order` e publica `OrderPlacedEvent`) |
+| GET | `/orders` | Lista os pedidos |
 | GET | `/orders/{id}` | Consulta o status de um pedido |
 | GET | `/library/{userId}` | Biblioteca do usuário (busca o usuário via request/response no RabbitMQ, depois consulta os jogos comprados) |
 | GET | `/health` | Health check |

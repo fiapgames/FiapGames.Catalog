@@ -25,6 +25,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbCo
             entity.HasKey(o => o.Id);
             entity.Property(o => o.Price).HasColumnType("decimal(18,2)");
             entity.Property(o => o.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(o => o.RejectionReason).HasMaxLength(500);
             entity.HasIndex(o => o.UserId);
 
             entity.HasOne(o => o.Game)

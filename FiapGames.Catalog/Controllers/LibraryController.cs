@@ -28,8 +28,8 @@ public class LibraryController(CatalogDbContext dbContext, IRequestClient<UserLo
         catch (RequestTimeoutException)
         {
             return Problem(
-                title: "User service unavailable",
-                detail: "Timed out waiting for a response from the users service.",
+                title: "Serviço de usuários indisponível",
+                detail: "Tempo esgotado aguardando resposta do serviço de usuários.",
                 statusCode: StatusCodes.Status503ServiceUnavailable);
         }
 

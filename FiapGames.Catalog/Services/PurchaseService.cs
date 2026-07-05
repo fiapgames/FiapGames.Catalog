@@ -50,6 +50,6 @@ public class PurchaseService(CatalogDbContext dbContext, IPublishEndpoint publis
 
         return new PurchaseResult(
             PurchaseResultStatus.Success,
-            new OrderDto(order.Id, order.UserId, order.GameId, order.Price, order.Status, order.CreatedAt, order.UpdatedAt));
+            new OrderDto(order.Id, order.UserId, order.GameId, order.Price, order.Status, order.RejectionReason, order.CreatedAt, order.UpdatedAt));
     }
 }
