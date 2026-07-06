@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 using FiapGames.Catalog.Configuration;
-using FiapGames.Catalog.Data;
-using FiapGames.Catalog.Services;
 using FiapGames.Catalog.Validators;
 using FiapGames.Contracts.Requests.User;
+using FiapGames.Core.Services;
+using FiapGames.Data;
+using FiapGames.Services;
+using FiapGames.Services.Consumers;
 using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +23,7 @@ builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 
 builder.Services.AddMassTransit(busConfigurator =>
 {
-    busConfigurator.AddConsumers(typeof(Program).Assembly);
+    busConfigurator.AddConsumers(typeof(PaymentProcessedConsumer).Assembly);
 
     busConfigurator.UsingRabbitMq((context, rabbitMqConfigurator) =>
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace FiapGames.Catalog.Migrations
+namespace FiapGames.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

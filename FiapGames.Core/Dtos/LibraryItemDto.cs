@@ -1,4 +1,4 @@
-namespace FiapGames.Catalog.Dtos;
+namespace FiapGames.Core.Dtos;
 
 public record LibraryItemDto(Guid GameId, string Title, string Genre, Guid OrderId, DateTime PurchasedAt);
 

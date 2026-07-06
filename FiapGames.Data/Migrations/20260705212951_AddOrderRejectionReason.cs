@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace FiapGames.Catalog.Migrations
+namespace FiapGames.Data.Migrations
 {
     /// <inheritdoc />
     public partial class AddOrderRejectionReason : Migration

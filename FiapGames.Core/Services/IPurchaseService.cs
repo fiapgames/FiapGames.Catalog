@@ -1,4 +1,4 @@
-namespace FiapGames.Catalog.Services;
+namespace FiapGames.Core.Services;
 
 public interface IPurchaseService
 {

@@ -1,5 +1,5 @@
-using FiapGames.Catalog.Data;
-using FiapGames.Catalog.Dtos;
+using FiapGames.Data;
+using FiapGames.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

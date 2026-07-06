@@ -1,4 +1,4 @@
-namespace FiapGames.Catalog.Models;
+namespace FiapGames.Core.Models;
 
 public class Order
 {

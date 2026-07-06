@@ -1,9 +1,10 @@
-using FiapGames.Catalog.Data;
-using FiapGames.Catalog.Dtos;
-using FiapGames.Catalog.Models;
+using FiapGames.Data;
+using FiapGames.Core.Services;
+using FiapGames.Core.Dtos;
+using FiapGames.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FiapGames.Catalog.Services;
+namespace FiapGames.Services;
 
 public class GameService(CatalogDbContext dbContext) : IGameService
 {

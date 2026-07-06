@@ -1,6 +1,6 @@
-using FiapGames.Catalog.Models;
+using FiapGames.Core.Models;
 
-namespace FiapGames.Catalog.Dtos;
+namespace FiapGames.Core.Dtos;
 
 public record PurchaseRequestDto(Guid UserId);
 

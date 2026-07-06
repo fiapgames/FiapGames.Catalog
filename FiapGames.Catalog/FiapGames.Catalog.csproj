@@ -16,8 +16,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiapGames.Core\FiapGames.Core.csproj" />
+    <ProjectReference Include="..\FiapGames.Data\FiapGames.Data.csproj" />
+    <ProjectReference Include="..\FiapGames.Services\FiapGames.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
-using FiapGames.Catalog.Models;
+using FiapGames.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FiapGames.Catalog.Data;
+namespace FiapGames.Data;
 
 public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {

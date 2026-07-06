@@ -1,6 +1,6 @@
-using FiapGames.Catalog.Dtos;
+using FiapGames.Core.Dtos;
 
-namespace FiapGames.Catalog.Services;
+namespace FiapGames.Core.Services;
 
 public interface IGameService
 {

@@ -1,5 +1,5 @@
-using FiapGames.Catalog.Dtos;
-using FiapGames.Catalog.Services;
+using FiapGames.Core.Dtos;
+using FiapGames.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiapGames.Catalog.Controllers;

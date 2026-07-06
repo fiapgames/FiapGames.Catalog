@@ -1,4 +1,4 @@
-namespace FiapGames.Catalog.Dtos;
+namespace FiapGames.Core.Dtos;
 
 public record GameDto(Guid Id, string Title, string Description, decimal Price, string Genre, bool Active, DateTime CreatedAt);
 

@@ -1,4 +1,4 @@
-using FiapGames.Catalog.Dtos;
+using FiapGames.Core.Dtos;
 using FluentValidation;
 
 namespace FiapGames.Catalog.Validators;

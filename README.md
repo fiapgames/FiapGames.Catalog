@@ -4,16 +4,19 @@ ASP.NET Core Web API responsável pelo catálogo de jogos do FiapGames (CatalogA
 
 ## Arquitetura
 
+Solução dividida em 4 projetos:
+
 ```
-Controllers/     Endpoints HTTP (Games, Orders, Library, Health)
-Data/            DbContext (CatalogDbContext)
-Models/          Entidades persistidas (Game, Order, OrderStatus, UserGameLibrary)
-Dtos/            Contratos de entrada/saída da API
-Validators/      Regras de validação (FluentValidation) + filtro que as aplica automaticamente
-Services/        Regras de negócio (IGameService, IPurchaseService)
-Consumers/       Consumers MassTransit (PaymentProcessedConsumer)
-Migrations/      Migrations do EF Core
+FiapGames.Core/      Models (Game, Order, OrderStatus, UserGameLibrary), Dtos e interfaces de serviço
+                      (IGameService, IPurchaseService, PurchaseResult) — sem dependências externas
+FiapGames.Data/       CatalogDbContext + Migrations do EF Core
+FiapGames.Services/   Implementações (GameService, PurchaseService) e Consumers MassTransit
+                      (PaymentProcessedConsumer)
+FiapGames.Catalog/    Projeto Web: Controllers (Games, Orders, Library, Health), Validators
+                      (FluentValidation) e Program.cs (composição/DI)
 ```
+
+Dependências entre projetos: `Catalog -> Services -> Data -> Core` (Catalog também referencia Core e Data diretamente).
 
 Endpoints:
 
@@ -63,15 +66,6 @@ CatalogAPI consulta a própria base e retorna os jogos do usuário + dados bási
 | `ConnectionStrings` | `SqlServer` | Connection string do SQL Server |
 | `RabbitMq` | `Host`, `VirtualHost`, `UserName`, `Password` | Conexão com o RabbitMQ |
 | — | `ASPNETCORE_ENVIRONMENT` | Ambiente de execução (Development/Production) |
-
-## Dependência local do FiapGames.Contracts
-
-Este repositório usa `FiapGames.Contracts` 1.1.0, que inclui os contratos `UserLookupRequested`/`UserLookupResponded` (namespace `FiapGames.Contracts.Requests.User`) — ainda **não publicado** no nuget.org (lá só existe a 1.0.0). Por isso:
-
-- `nuget.config` na raiz adiciona uma fonte local (`./local-packages`) além do nuget.org.
-- `local-packages/FiapGames.Contracts.1.1.0.nupkg` está commitado no repositório (exceção aberta no `.gitignore`) para que o build — inclusive dentro do Docker — funcione sem depender de nada fora deste repositório.
-
-Quando `FiapGames.Contracts` 1.1.0 (ou superior) for publicado de verdade no nuget.org, remova `local-packages/`, a entrada `fiapgames-contracts-local` do `nuget.config` e as duas linhas correspondentes do `Dockerfile`.
 
 ## Executando localmente
 

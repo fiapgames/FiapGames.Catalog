@@ -1,5 +1,5 @@
-using FiapGames.Catalog.Data;
-using FiapGames.Catalog.Dtos;
+using FiapGames.Data;
+using FiapGames.Core.Dtos;
 using FiapGames.Contracts.Requests.User;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;

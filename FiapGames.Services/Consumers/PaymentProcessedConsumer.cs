@@ -1,10 +1,11 @@
-using FiapGames.Catalog.Data;
-using FiapGames.Catalog.Models;
+using FiapGames.Data;
+using FiapGames.Core.Models;
 using FiapGames.Contracts.IntegrationEvents;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace FiapGames.Catalog.Consumers;
+namespace FiapGames.Services.Consumers;
 
 public class PaymentProcessedConsumer(CatalogDbContext dbContext, ILogger<PaymentProcessedConsumer> logger)
     : IConsumer<PaymentProcessedEvent>
