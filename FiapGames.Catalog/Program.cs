@@ -46,6 +46,14 @@ builder.Services.AddControllers(options => options.Filters.Add<FluentValidationA
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+const string DevCorsPolicy = "DevCors";
+builder.Services.AddCors(options =>
+{
+    // The frontend (Vite dev server) calls this API directly, cross-origin, in dev.
+    options.AddPolicy(DevCorsPolicy, policy =>
+        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -56,6 +64,8 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors(DevCorsPolicy);
 
 app.MapControllers();
 
