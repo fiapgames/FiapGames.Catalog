@@ -50,8 +50,11 @@ const string DevCorsPolicy = "DevCors";
 builder.Services.AddCors(options =>
 {
     // The frontend (Vite dev server) calls this API directly, cross-origin, in dev.
+    // Vite picks the next free port (5173, 5174, ...) when the default is busy, so any
+    // localhost port is allowed here instead of a fixed one.
     options.AddPolicy(DevCorsPolicy, policy =>
-        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod());
+        policy.SetIsOriginAllowed(origin => new Uri(origin).Host is "localhost" or "127.0.0.1")
+            .AllowAnyHeader().AllowAnyMethod());
 });
 
 var app = builder.Build();
