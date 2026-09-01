@@ -2,6 +2,7 @@ using FiapGames.Data;
 using FiapGames.Core.Dtos;
 using FiapGames.Contracts.Requests.User;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace FiapGames.Catalog.Controllers;
 
 [ApiController]
 [Route("library/{userId:guid}")]
+[Authorize]
 public class LibraryController(CatalogDbContext dbContext, IRequestClient<UserLookupRequested> userRequestClient)
     : ControllerBase
 {

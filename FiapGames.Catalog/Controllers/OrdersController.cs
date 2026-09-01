@@ -1,5 +1,6 @@
 using FiapGames.Data;
 using FiapGames.Core.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace FiapGames.Catalog.Controllers;
 
 [ApiController]
 [Route("orders")]
+[Authorize]
 public class OrdersController(CatalogDbContext dbContext) : ControllerBase
 {
     [HttpGet]

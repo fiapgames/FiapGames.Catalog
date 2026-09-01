@@ -9,3 +9,5 @@ data:
   ASPNETCORE_ENVIRONMENT: "Production"
   RabbitMq__Host: "rabbitmq.fiapgames.svc.cluster.local"
   RabbitMq__VirtualHost: "/"
+  Jwt__Issuer: "User.Games.Fiap"
+  Jwt__Audience: "Games.Fiap"
