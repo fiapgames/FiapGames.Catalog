@@ -1,5 +1,7 @@
 using FiapGames.Data;
 using FiapGames.Core.Dtos;
+using FiapGames.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +9,8 @@ namespace FiapGames.Catalog.Controllers;
 
 [ApiController]
 [Route("orders")]
-public class OrdersController(CatalogDbContext dbContext) : ControllerBase
+[Authorize]
+public class OrdersController(CatalogDbContext dbContext, IPurchaseHistoryStore purchaseHistoryStore) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<List<OrderDto>>> GetAll(CancellationToken cancellationToken)
@@ -29,5 +32,23 @@ public class OrdersController(CatalogDbContext dbContext) : ControllerBase
             .FirstOrDefaultAsync(cancellationToken);
 
         return order is null ? NotFound() : Ok(order);
+    }
+
+    [HttpGet("{id:guid}/history")]
+    public async Task<ActionResult<List<PurchaseEventDto>>> GetHistory(Guid id, CancellationToken cancellationToken)
+    {
+        var orderExists = await dbContext.Orders.AnyAsync(o => o.Id == id, cancellationToken);
+        if (!orderExists)
+        {
+            return NotFound();
+        }
+
+        var events = await purchaseHistoryStore.GetByOrderAsync(id, cancellationToken);
+
+        var history = events
+            .Select(e => new PurchaseEventDto(e.Id, e.OrderId, e.UserId, e.GameId, e.GameTitle, e.EventType, e.Price, e.Reason, e.OccurredAt))
+            .ToList();
+
+        return Ok(history);
     }
 }

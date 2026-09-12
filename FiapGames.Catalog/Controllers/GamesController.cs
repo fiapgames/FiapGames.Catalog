@@ -1,11 +1,13 @@
 using FiapGames.Core.Dtos;
 using FiapGames.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiapGames.Catalog.Controllers;
 
 [ApiController]
 [Route("games")]
+[Authorize]
 public class GamesController(IGameService gameService, IPurchaseService purchaseService) : ControllerBase
 {
     [HttpGet]

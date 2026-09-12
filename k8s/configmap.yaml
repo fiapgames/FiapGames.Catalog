@@ -9,3 +9,9 @@ data:
   ASPNETCORE_ENVIRONMENT: "Production"
   RabbitMq__Host: "rabbitmq.fiapgames.svc.cluster.local"
   RabbitMq__VirtualHost: "/"
+  Jwt__Issuer: "User.Games.Fiap"
+  Jwt__Audience: "Games.Fiap"
+  Mongo__Database: "fiapgames-catalog-history"
+  # Redis não tem senha (é cache, não fonte de verdade) — por isso a connection
+  # string fica aqui, e não no Secret.
+  Redis__Connection: "redis.fiapgames.svc.cluster.local:6379"
