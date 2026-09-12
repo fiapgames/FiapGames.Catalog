@@ -3,8 +3,11 @@ using System.Text.Json.Serialization;
 using FiapGames.Catalog.Configuration;
 using FiapGames.Catalog.Validators;
 using FiapGames.Contracts.Requests.User;
+using FiapGames.Core.Models;
 using FiapGames.Core.Services;
 using FiapGames.Data;
+using FiapGames.Data.Caching;
+using FiapGames.Data.Mongo;
 using FiapGames.Services;
 using FiapGames.Services.Consumers;
 using FluentValidation;
@@ -12,6 +15,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +57,28 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
 
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+
+var mongoOptions = builder.Configuration.GetSection(MongoOptions.SectionName).Get<MongoOptions>()
+    ?? new MongoOptions();
+
+var mongoConnectionString = builder.Configuration.GetConnectionString("Mongo")
+    ?? throw new InvalidOperationException("ConnectionStrings:Mongo is missing.");
+
+// Precisa rodar ANTES de qualquer outro código tocar o Mongo — inclusive antes do
+// `new MongoClient` logo abaixo. Ver o comentário no próprio método.
+PurchaseHistoryStore.RegisterSerializers();
+
+// IMongoClient/IMongoDatabase são thread-safe e devem ser reaproveitados pela
+// aplicação inteira — por isso singleton, ao contrário do CatalogDbContext (scoped).
+builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoOptions.Database));
+builder.Services.AddSingleton<IPurchaseHistoryStore, PurchaseHistoryStore>();
+
+var redisConnection = builder.Configuration["Redis:Connection"]
+    ?? throw new InvalidOperationException("Redis:Connection is missing.");
+
+builder.Services.AddStackExchangeRedisCache(options => options.Configuration = redisConnection);
+builder.Services.AddSingleton<ICacheStore, CacheStore>();
 
 builder.Services.AddMassTransit(busConfigurator =>
 {
@@ -96,6 +122,12 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
     await dbContext.Database.MigrateAsync();
+
+    var mongoDatabase = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+    var purchaseEvents = mongoDatabase.GetCollection<PurchaseEvent>(PurchaseHistoryStore.CollectionName);
+    await purchaseEvents.Indexes.CreateOneAsync(
+        new CreateIndexModel<PurchaseEvent>(
+            Builders<PurchaseEvent>.IndexKeys.Ascending(e => e.OrderId).Ascending(e => e.OccurredAt)));
 }
 
 app.UseSwagger();

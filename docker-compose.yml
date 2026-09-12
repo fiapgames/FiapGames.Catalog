@@ -32,6 +32,37 @@ services:
     volumes:
       - sqlserver-data:/var/opt/mssql
 
+  mongodb:
+    image: mongo:7
+    container_name: fiapgames-catalog-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: fiapgames-admin
+      MONGO_INITDB_ROOT_PASSWORD: FiapGames@Admin123
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mongodb-data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: fiapgames-redis
+    ports:
+      # 6380 no host: a 6379 pode já estar em uso por outro projeto na máquina.
+      # Comunicação entre containers usa sempre a porta interna (redis:6379).
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis-data:/data
+
   catalog-api:
     build:
       context: .
@@ -42,6 +73,10 @@ services:
         condition: service_healthy
       sqlserver:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
@@ -50,7 +85,12 @@ services:
       RabbitMq__VirtualHost: "/"
       RabbitMq__UserName: fiapgames-admin
       RabbitMq__Password: FiapGames@Admin123
+      Jwt__SecretKey: "dev-only-change-this-secret-key-32-bytes-minimum"
+      ConnectionStrings__Mongo: "mongodb://fiapgames-admin:FiapGames%40Admin123@mongodb:27017"
+      Redis__Connection: "redis:6379"
 
 volumes:
   sqlserver-data:
   rabbitmq-data:
+  mongodb-data:
+  redis-data:
