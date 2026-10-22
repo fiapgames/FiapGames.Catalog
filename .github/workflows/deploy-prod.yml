@@ -29,6 +29,9 @@ jobs:
   image-deploy:
     needs: build-test
     runs-on: ubuntu-latest
+    env:
+      # Sem a AWS configurada o deploy é pulado, e a main continua verde.
+      DEPLOY: ${{ github.event_name == 'push' && vars.AWS_ROLE_ARN != '' }}
     permissions:
       contents: read
       id-token: write
@@ -49,20 +52,25 @@ jobs:
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE" \
             image --no-progress --severity HIGH,CRITICAL --ignore-unfixed "$IMAGE_NAME:$TAG"
 
+      - name: Deploy pulado
+        if: github.event_name == 'push' && env.DEPLOY != 'true'
+        run: |
+          echo "::notice::Deploy pulado: configure as variáveis AWS_ROLE_ARN e AWS_REGION para publicar no EKS."
+
       - name: Credenciais da AWS (OIDC, sem chave guardada)
-        if: github.event_name == 'push'
+        if: env.DEPLOY == 'true'
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Login no ECR
-        if: github.event_name == 'push'
+        if: env.DEPLOY == 'true'
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push
-        if: github.event_name == 'push'
+        if: env.DEPLOY == 'true'
         run: |
           IMAGE="${{ steps.ecr.outputs.registry }}/$IMAGE_NAME:$TAG"
           docker tag "$IMAGE_NAME:$TAG" "$IMAGE"
@@ -70,7 +78,7 @@ jobs:
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Script de deploy compartilhado
-        if: github.event_name == 'push'
+        if: env.DEPLOY == 'true'
         uses: actions/checkout@v7
         with:
           repository: fiapgames/FiapGames.Orchestration
@@ -78,7 +86,7 @@ jobs:
           path: orchestration
 
       - name: Deploy no EKS (rolling update)
-        if: github.event_name == 'push'
+        if: env.DEPLOY == 'true'
         run: |
           aws eks update-kubeconfig --name "${{ vars.EKS_CLUSTER || 'fiapgames' }}"
           orchestration/ci/deploy.sh k8s "$MANIFEST_IMAGE" "$IMAGE"
