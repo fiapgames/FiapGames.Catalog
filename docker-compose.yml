@@ -4,7 +4,7 @@ services:
     container_name: fiapgames-catalog-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: fiapgames-admin
-      RABBITMQ_DEFAULT_PASS: FiapGames@Admin123
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:?defina no .env (veja .env.example)}"
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -21,7 +21,7 @@ services:
     container_name: fiapgames-catalog-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "FiapGames@Admin123"
+      MSSQL_SA_PASSWORD: "${SQLSERVER_CATALOG_PASSWORD:?defina no .env (veja .env.example)}"
     ports:
       - "1433:1433"
     healthcheck:
@@ -37,7 +37,7 @@ services:
     container_name: fiapgames-catalog-mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: fiapgames-admin
-      MONGO_INITDB_ROOT_PASSWORD: FiapGames@Admin123
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD:?defina no .env (veja .env.example)}"
     ports:
       - "27017:27017"
     healthcheck:
@@ -80,13 +80,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=fiapgames-catalog;User Id=sa;Password=FiapGames@Admin123;TrustServerCertificate=True"
+      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=fiapgames-catalog;User Id=sa;Password=${SQLSERVER_CATALOG_PASSWORD};TrustServerCertificate=True"
       RabbitMq__Host: rabbitmq
       RabbitMq__VirtualHost: "/"
       RabbitMq__UserName: fiapgames-admin
-      RabbitMq__Password: FiapGames@Admin123
-      Jwt__SecretKey: "dev-only-change-this-secret-key-32-bytes-minimum"
-      ConnectionStrings__Mongo: "mongodb://fiapgames-admin:FiapGames%40Admin123@mongodb:27017"
+      RabbitMq__Password: "${RABBITMQ_PASSWORD}"
+      Jwt__SecretKey: "${JWT_SECRET_KEY:?defina no .env (veja .env.example)}"
+      ConnectionStrings__Mongo: "mongodb://fiapgames-admin:${MONGO_PASSWORD}@mongodb:27017"
       Redis__Connection: "redis:6379"
 
 volumes:
