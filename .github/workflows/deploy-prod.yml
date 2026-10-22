@@ -1,6 +1,6 @@
 # Build e teste em todo push/PR; imagem no ECR e rolling update no EKS só na main.
 # Simulação local dos mesmos passos: FiapGames.Orchestration/ci/simulate-pipeline.sh catalog-api
-name: CI/CD
+name: deploy-prod
 
 on:
   push:
