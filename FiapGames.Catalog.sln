@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiapGames.Data", "FiapGames
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiapGames.Services", "FiapGames.Services\FiapGames.Services.csproj", "{A7AF2D38-5914-42FB-91D4-C52D5236D702}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiapGames.Catalog.Tests", "FiapGames.Catalog.Tests\FiapGames.Catalog.Tests.csproj", "{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{A7AF2D38-5914-42FB-91D4-C52D5236D702}.Release|x64.Build.0 = Release|Any CPU
 		{A7AF2D38-5914-42FB-91D4-C52D5236D702}.Release|x86.ActiveCfg = Release|Any CPU
 		{A7AF2D38-5914-42FB-91D4-C52D5236D702}.Release|x86.Build.0 = Release|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Release|x64.Build.0 = Release|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{F20D7FD7-907C-41D5-A747-0C8FA5BA74C9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
