@@ -3,11 +3,12 @@ using FiapGames.Data.Caching;
 using FiapGames.Core.Services;
 using FiapGames.Core.Dtos;
 using FiapGames.Core.Models;
+using FiapGames.Data.Search;
 using Microsoft.EntityFrameworkCore;
 
 namespace FiapGames.Services;
 
-public class GameService(CatalogDbContext dbContext, ICacheStore cacheStore) : IGameService
+public class GameService(CatalogDbContext dbContext, ICacheStore cacheStore, SearchIndexSynchronizer search) : IGameService
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
 
@@ -54,7 +55,7 @@ public class GameService(CatalogDbContext dbContext, ICacheStore cacheStore) : I
         };
 
         dbContext.Games.Add(game);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await SaveAndIndexAsync(game, cancellationToken);
 
         await cacheStore.RemoveAsync(AllGamesCacheKey, cancellationToken);
 
@@ -75,7 +76,7 @@ public class GameService(CatalogDbContext dbContext, ICacheStore cacheStore) : I
         game.Genre = dto.Genre;
         game.Active = dto.Active;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await SaveAndIndexAsync(game, cancellationToken);
 
         await cacheStore.RemoveAsync(AllGamesCacheKey, cancellationToken);
         await cacheStore.RemoveAsync(GameCacheKey(id), cancellationToken);
@@ -92,12 +93,21 @@ public class GameService(CatalogDbContext dbContext, ICacheStore cacheStore) : I
         }
 
         game.Active = false;
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await SaveAndIndexAsync(game, cancellationToken);
 
         await cacheStore.RemoveAsync(AllGamesCacheKey, cancellationToken);
         await cacheStore.RemoveAsync(GameCacheKey(id), cancellationToken);
 
         return true;
+    }
+
+    private async Task SaveAndIndexAsync(Game game, CancellationToken cancellationToken)
+    {
+        game.SearchVersion++;
+        dbContext.SearchIndexOutbox.Add(new SearchIndexOutboxMessage { GameId = game.Id, Version = game.SearchVersion });
+        // EF saves both records atomically. SearchVersion also detects competing SQL writes.
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await search.TrySynchronizeAsync(game, cancellationToken);
     }
 
     private static GameDto ToDto(Game game) =>

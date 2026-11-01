@@ -12,6 +12,7 @@ data:
   Jwt__Issuer: "User.Games.Fiap"
   Jwt__Audience: "Games.Fiap"
   Mongo__Database: "fiapgames-catalog-history"
+  OpenSearch__IndexName: "games-v1"
   # Redis não tem senha (é cache, não fonte de verdade) — por isso a connection
   # string fica aqui, e não no Secret.
   Redis__Connection: "redis.fiapgames.svc.cluster.local:6379"

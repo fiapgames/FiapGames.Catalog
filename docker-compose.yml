@@ -63,12 +63,32 @@ services:
     volumes:
       - redis-data:/data
 
+  opensearch:
+    image: opensearchproject/opensearch:2.19.4
+    container_name: fiapgames-opensearch
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
   catalog-api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: fiapgames-catalog
     depends_on:
+      opensearch:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       sqlserver:
@@ -80,6 +100,8 @@ services:
     ports:
       - "8080:8080"
     environment:
+      OpenSearch__Url: "http://opensearch:9200"
+      OpenSearch__IndexName: "games-v1"
       ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=fiapgames-catalog;User Id=sa;Password=${SQLSERVER_CATALOG_PASSWORD};TrustServerCertificate=True"
       RabbitMq__Host: rabbitmq
       RabbitMq__VirtualHost: "/"
@@ -90,6 +112,7 @@ services:
       Redis__Connection: "redis:6379"
 
 volumes:
+  opensearch-data:
   sqlserver-data:
   rabbitmq-data:
   mongodb-data:

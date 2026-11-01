@@ -23,6 +23,7 @@ Endpoints:
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/games` | Lista os jogos |
+| GET | `/search?q=minecrfat&page=1&pageSize=20` | Busca fuzzy por relevância no OpenSearch (JWT obrigatório) |
 | GET | `/games/{id}` | Detalhe de um jogo |
 | POST | `/games` | Cria um jogo |
 | PUT | `/games/{id}` | Atualiza um jogo |
@@ -58,6 +59,7 @@ CatalogAPI consulta a própria base e retorna os jogos do usuário + dados bási
 - Swagger (Swashbuckle)
 - MassTransit + RabbitMQ
 - FluentValidation (validação automática dos DTOs via action filter)
+- OpenSearch.Client + Amazon OpenSearch Service (busca fuzzy e indexação com outbox SQL)
 
 ## Variáveis de ambiente
 
@@ -66,6 +68,7 @@ CatalogAPI consulta a própria base e retorna os jogos do usuário + dados bási
 | `ConnectionStrings` | `SqlServer` | Connection string do SQL Server |
 | `RabbitMq` | `Host`, `VirtualHost`, `UserName`, `Password` | Conexão com o RabbitMQ |
 | — | `ASPNETCORE_ENVIRONMENT` | Ambiente de execução (Development/Production) |
+| `OpenSearch` | `Url`, `IndexName`, `RetryIntervalSeconds` | Endpoint, alias do índice e intervalo de retentativa |
 
 ## Executando localmente
 
@@ -73,7 +76,7 @@ CatalogAPI consulta a própria base e retorna os jogos do usuário + dados bási
 docker compose up -d --build
 ```
 
-Isso inicia o SQL Server e a API (porta `8080`). As migrations do EF Core são aplicadas automaticamente na inicialização.
+Isso inicia SQL Server, MongoDB, Redis, RabbitMQ, OpenSearch e a API (porta `8080`). Gere as variáveis obrigatórias do `.env` antes da primeira execução. As migrations do EF Core são aplicadas automaticamente na inicialização. Não execute esse Compose junto com o de Orchestration, pois usam as mesmas portas e nomes de containers.
 
 - Health check: `http://localhost:8080/health`
 - Swagger: `http://localhost:8080/swagger`
@@ -83,10 +86,12 @@ Isso inicia o SQL Server e a API (porta `8080`). As migrations do EF Core são a
 Manifests em `k8s/`:
 
 - `namespace.yaml`
-- `configmap.yaml` / `secret.yaml` — configuração do `catalog-api`
+- `configmap.yaml` — configuração não sigilosa; o Secret `catalog-api-secrets` é criado pelo `ci/secrets.sh` de Orchestration
 - `deployment.yaml` — Deployment + Service da imagem `brendhom/fiapgames-catalog-api:latest`
 
 O Secret assume um SQL Server já disponível no cluster em `sqlserver.fiapgames.svc.cluster.local`.
+
+O Deployment também exige o ConfigMap `catalog-search-config`, criado por `FiapGames.Orchestration` com o endpoint correto do Kind ou da AWS. Veja [busca, consistência, recuperação e testes](SEARCH.md).
 
 ```bash
 kubectl apply -f k8s/

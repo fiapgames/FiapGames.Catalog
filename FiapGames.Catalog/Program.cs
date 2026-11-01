@@ -16,6 +16,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using FiapGames.Data.Search;
+using FiapGames.Catalog.Search;
+using OpenSearch.Client;
+using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +61,24 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
 
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+
+builder.Services.AddOptions<OpenSearchOptions>()
+    .Bind(builder.Configuration.GetSection(OpenSearchOptions.SectionName))
+    .Validate(o => Uri.TryCreate(o.Url, UriKind.Absolute, out var uri) &&
+        uri.Scheme is "http" or "https" && string.IsNullOrEmpty(uri.UserInfo), "OpenSearch:Url must be an HTTP(S) endpoint without credentials.")
+    .Validate(o => Regex.IsMatch(o.IndexName, "^[a-z0-9][a-z0-9_-]{0,127}$"), "Invalid OpenSearch index name.")
+    .Validate(o => o.NumberOfReplicas >= 0 && o.RetryIntervalSeconds is >= 1 and <= 300, "Invalid OpenSearch settings.")
+    .ValidateOnStart();
+builder.Services.AddSingleton<IOpenSearchClient>(sp =>
+{
+    var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<OpenSearchOptions>>().Value;
+    return new OpenSearchClient(new ConnectionSettings(new Uri(settings.Url))
+        .DefaultIndex(settings.IndexName).RequestTimeout(TimeSpan.FromSeconds(3)).MaximumRetries(0));
+});
+builder.Services.AddSingleton<IGameSearchIndex, OpenSearchGameIndex>();
+builder.Services.AddScoped<SearchIndexSynchronizer>();
+builder.Services.AddSingleton<SearchIndexState>();
+builder.Services.AddHostedService<SearchIndexWorker>();
 
 var mongoOptions = builder.Configuration.GetSection(MongoOptions.SectionName).Get<MongoOptions>()
     ?? new MongoOptions();
@@ -100,7 +122,11 @@ builder.Services.AddMassTransit(busConfigurator =>
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateGameDtoValidator>();
 
-builder.Services.AddControllers(options => options.Filters.Add<FluentValidationActionFilter>())
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<FluentValidationActionFilter>();
+        options.Filters.Add<ConcurrencyExceptionFilter>();
+    })
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -128,6 +154,13 @@ using (var scope = app.Services.CreateScope())
     await purchaseEvents.Indexes.CreateOneAsync(
         new CreateIndexModel<PurchaseEvent>(
             Builders<PurchaseEvent>.IndexKeys.Ascending(e => e.OrderId).Ascending(e => e.OccurredAt)));
+}
+
+if (builder.Configuration.GetValue<bool>("OpenSearch:RebuildOnly"))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<SearchIndexSynchronizer>().RebuildAsync(CancellationToken.None);
+    return;
 }
 
 app.UseSwagger();

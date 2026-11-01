@@ -47,6 +47,10 @@ namespace FiapGames.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<long>("SearchVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -126,6 +130,30 @@ namespace FiapGames.Data.Migrations
                     b.ToTable("UserGameLibraries");
                 });
 
+            modelBuilder.Entity("FiapGames.Data.Search.SearchIndexOutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("GameId", "Version");
+
+                    b.ToTable("SearchIndexOutbox");
+                });
+
             modelBuilder.Entity("FiapGames.Core.Models.Order", b =>
                 {
                     b.HasOne("FiapGames.Core.Models.Game", "Game")
@@ -154,6 +182,15 @@ namespace FiapGames.Data.Migrations
                     b.Navigation("Game");
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("FiapGames.Data.Search.SearchIndexOutboxMessage", b =>
+                {
+                    b.HasOne("FiapGames.Core.Models.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

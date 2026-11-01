@@ -55,11 +55,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: catalog-api-config
+            - configMapRef:
+                name: catalog-search-config
             - secretRef:
                 name: catalog-api-secrets
           readinessProbe:
             httpGet:
-              path: /health
+              path: /health/ready
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 10
