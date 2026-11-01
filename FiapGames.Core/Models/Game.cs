@@ -9,4 +9,5 @@ public class Game
     public string Genre { get; set; } = string.Empty;
     public bool Active { get; set; }
     public DateTime CreatedAt { get; set; }
+    public long SearchVersion { get; set; }
 }

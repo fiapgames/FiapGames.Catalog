@@ -1,4 +1,5 @@
 using FiapGames.Core.Models;
+using FiapGames.Data.Search;
 using Microsoft.EntityFrameworkCore;
 
 namespace FiapGames.Data;
@@ -8,6 +9,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbCo
     public DbSet<Game> Games => Set<Game>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<UserGameLibrary> UserGameLibraries => Set<UserGameLibrary>();
+    public DbSet<SearchIndexOutboxMessage> SearchIndexOutbox => Set<SearchIndexOutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +20,15 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbCo
             entity.Property(g => g.Description).HasMaxLength(2000);
             entity.Property(g => g.Genre).HasMaxLength(100);
             entity.Property(g => g.Price).HasColumnType("decimal(18,2)");
+            entity.Property(g => g.SearchVersion).IsConcurrencyToken();
+        });
+
+        modelBuilder.Entity<SearchIndexOutboxMessage>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            entity.HasIndex(m => new { m.GameId, m.Version });
+            entity.HasIndex(m => m.CreatedAt);
+            entity.HasOne<Game>().WithMany().HasForeignKey(m => m.GameId).OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Order>(entity =>
